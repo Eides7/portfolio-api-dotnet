@@ -1,5 +1,6 @@
 using Portfolio.Application.Abstractions;
 using Portfolio.Application.Trades.CreateTrade;
+using Portfolio.Application.Trades.GetTrades;
 using Portfolio.Infrastructure.Repositories;
 using System.Reflection;
 
@@ -14,8 +15,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-builder.Services.AddScoped<ITradeRepository, InMemoryTradeRepository>();
+builder.Services.AddSingleton<ITradeRepository, InMemoryTradeRepository>();
 builder.Services.AddScoped<CreateTradeHandler>();
+builder.Services.AddScoped<GetTradesHandler>();
 
 
 var app = builder.Build();
@@ -29,6 +31,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"{context.Request.Method} {context.Request.Path}");
+    await next();
+    Console.WriteLine($"--> {context.Response.StatusCode}");
+});
+
 app.MapControllers();
 
 try

@@ -12,5 +12,11 @@ namespace Portfolio.Infrastructure.Repositories
             _trades.Add(trade);
             return Task.CompletedTask;
         }
+
+        public Task<IReadOnlyList<Trade>> GetAllAsync(CancellationToken ct)
+        {
+            IReadOnlyList<Trade> snapshot = _trades.ToList();
+            return Task.FromResult(snapshot);
+        }
     }
 }

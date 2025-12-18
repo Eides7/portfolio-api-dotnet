@@ -5,5 +5,6 @@ namespace Portfolio.Application.Abstractions
     public interface ITradeRepository
     {
         Task AddAsync(Trade trade, CancellationToken ct);
+        Task<IReadOnlyList<Trade>> GetAllAsync(CancellationToken ct);
     }
 }
