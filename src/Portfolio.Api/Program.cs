@@ -2,8 +2,10 @@ using Portfolio.Application.Abstractions;
 using Portfolio.Application.Portfolio.GetPositions;
 using Portfolio.Application.Trades.CreateTrade;
 using Portfolio.Application.Trades.GetTrades;
+using Portfolio.Infrastructure.Persistence;
 using Portfolio.Infrastructure.Repositories;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,11 +17,19 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddDbContext<PortfolioDbContext>(options =>
+{
+    var cs = builder.Configuration.GetConnectionString("PortfolioDb");
+    options.UseSqlServer(cs);
+});
 
-builder.Services.AddSingleton<ITradeRepository, InMemoryTradeRepository>();
+builder.Services.AddScoped<ITradeRepository, EfTradeRepository>();
+
+//builder.Services.AddSingleton<ITradeRepository, InMemoryTradeRepository>();
 builder.Services.AddScoped<CreateTradeHandler>();
 builder.Services.AddScoped<GetTradesHandler>();
 builder.Services.AddScoped<GetPositionsHandler>();
+builder.Services.AddTransient<Portfolio.Api.Middlewares.ExceptionHandlingMiddleWare>();
 
 
 var app = builder.Build();
@@ -32,6 +42,8 @@ if (app.Environment.IsDevelopment())
     //app.MapOpenApi();
 }
 
+app.UseMiddleware<Portfolio.Api.Middlewares.ExceptionHandlingMiddleWare>();
+
 app.UseHttpsRedirection();
 
 app.Use(async (context, next) =>
@@ -40,6 +52,8 @@ app.Use(async (context, next) =>
     await next();
     Console.WriteLine($"--> {context.Response.StatusCode}");
 });
+
+;
 
 app.MapControllers();
 
