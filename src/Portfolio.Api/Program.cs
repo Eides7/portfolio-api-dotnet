@@ -1,4 +1,5 @@
 using Portfolio.Application.Abstractions;
+using Portfolio.Application.Portfolio.GetPositions;
 using Portfolio.Application.Trades.CreateTrade;
 using Portfolio.Application.Trades.GetTrades;
 using Portfolio.Infrastructure.Repositories;
@@ -18,6 +19,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<ITradeRepository, InMemoryTradeRepository>();
 builder.Services.AddScoped<CreateTradeHandler>();
 builder.Services.AddScoped<GetTradesHandler>();
+builder.Services.AddScoped<GetPositionsHandler>();
 
 
 var app = builder.Build();
