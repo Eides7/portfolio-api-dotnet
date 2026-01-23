@@ -6,6 +6,7 @@ using Portfolio.Infrastructure.Persistence;
 using Portfolio.Infrastructure.Repositories;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using Portfolio.Application.Portfolio.GetPnL;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 builder.Services.AddDbContext<PortfolioDbContext>(options =>
 {
     var cs = builder.Configuration.GetConnectionString("PortfolioDb");
@@ -24,6 +26,7 @@ builder.Services.AddDbContext<PortfolioDbContext>(options =>
 });
 
 builder.Services.AddScoped<ITradeRepository, EfTradeRepository>();
+builder.Services.AddScoped<GetPnLHandler>();
 
 //builder.Services.AddSingleton<ITradeRepository, InMemoryTradeRepository>();
 builder.Services.AddScoped<CreateTradeHandler>();
@@ -48,7 +51,7 @@ app.UseHttpsRedirection();
 
 app.Use(async (context, next) =>
 {
-    Console.WriteLine($"{context.Request.Method} {context.Request.Path}");
+    Console.WriteLine($"{context.Request.Method} {context.Request.Path}progra");
     await next();
     Console.WriteLine($"--> {context.Response.StatusCode}");
 });
@@ -68,4 +71,6 @@ catch (ReflectionTypeLoadException ex)
     foreach(var le in ex.LoaderExceptions)
         Console.WriteLine(le?.Message);
 }
+
+public partial class Program { }
 
