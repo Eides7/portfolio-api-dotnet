@@ -7,6 +7,7 @@ using Portfolio.Infrastructure.Repositories;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Portfolio.Application.Portfolio.GetPnL;
+using Portfolio.Infrastructure.Caching;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,8 @@ builder.Services.AddDbContext<PortfolioDbContext>(options =>
     options.UseSqlServer(cs);
 });
 
+
+
 builder.Services.AddScoped<ITradeRepository, EfTradeRepository>();
 builder.Services.AddScoped<GetPnLHandler>();
 
@@ -33,6 +36,17 @@ builder.Services.AddScoped<CreateTradeHandler>();
 builder.Services.AddScoped<GetTradesHandler>();
 builder.Services.AddScoped<GetPositionsHandler>();
 builder.Services.AddTransient<Portfolio.Api.Middlewares.ExceptionHandlingMiddleWare>();
+
+/*Cache service and its dependency stored in container*/
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+});
+builder.Services.AddScoped<ICacheService, DistributedCacheService>();
+
+/*Logging*/
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 
 var app = builder.Build();
